@@ -22,7 +22,7 @@ variable "tenants" {
     name        = string
     slug        = optional(string)
     description = optional(string)
-    group = optional(string)
+    group       = optional(string)
   }))
   default = {}
 }
@@ -58,12 +58,12 @@ variable "sites" {
     description      = optional(string)
     physical_address = optional(string)
     timezone         = optional(string)
-    group         = optional(string)
-    tenant        = optional(string)
+    group            = optional(string)
+    tenant           = optional(string)
     facility         = optional(string)
     latitude         = optional(string)
     longitude        = optional(string)
-    region = optional(string)
+    region           = optional(string)
   }))
   default = {}
 }
@@ -73,10 +73,10 @@ variable "locations" {
   type = map(object({
     name        = string
     slug        = optional(string)
-    site     = string
-    parent   = optional(string)
+    site        = string
+    parent      = optional(string)
     description = optional(string)
-    tenant   = optional(string)
+    tenant      = optional(string)
     status      = optional(string, "active")
   }))
   default = {}
@@ -96,10 +96,18 @@ variable "contact_groups" {
 variable "contacts" {
   description = "List of contacts to create"
   type = map(object({
-    name        = string
-    email       = string
-    phone       = optional(string)
-    group    = optional(string)
+    name  = string
+    email = string
+    phone = optional(string)
+    group = optional(string)
   }))
   default = {}
+}
+
+variable "contact_roles" {
+  description = "List of contact roles to create"
+  type = list(object({
+    name = string
+  }))
+  default = []
 }

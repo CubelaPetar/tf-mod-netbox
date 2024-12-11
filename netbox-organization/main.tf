@@ -102,4 +102,9 @@ resource "netbox_contact" "contacts" {
   group_id    = each.value.group != null ? netbox_contact_group.contact_groups[each.value.group].id : null
 }
 
+resource "netbox_contact_role" "contact_roles" {
+  for_each = { for role in var.contact_roles : role.name => role }
+
+  name = each.value.name
+}
 # ######## END CONFIGURE ORGANIZATION ############

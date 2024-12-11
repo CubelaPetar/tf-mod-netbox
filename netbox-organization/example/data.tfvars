@@ -103,6 +103,14 @@ organizations = {
           description = "Data Center Operations Team"
         }
       }
+      contact_roles = [
+        {
+          name        = "Engineer"
+        },
+        {
+          name        = "Manager"
+        }
+      ]
     }
   }
 }

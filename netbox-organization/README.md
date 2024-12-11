@@ -4,14 +4,15 @@ This module creates the organization structure in Netbox.
 
 It manages the following categories:
 
-- [x] Tenant Groups,
-- [x] Tenants,
-- [x] Regions,
-- [x] Site Groups,
-- [x] Sites,
-- [x] Locations,
-- [x] Contact Groups,
-- [x] Contacts.
+- [x] Tenant Groups
+- [x] Tenants
+- [x] Regions
+- [x] Site Groups
+- [x] Sites
+- [x] Locations
+- [x] Contact Group,
+- [x] Contacts
+- [x] Contact roles
 
 ## Usage
 
