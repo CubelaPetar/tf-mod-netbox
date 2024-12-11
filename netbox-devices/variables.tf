@@ -74,3 +74,21 @@ variable "devices" {
   }))
   default = {}
 }
+
+variable "site_id_map" {
+  description = "Mapping of site names to IDs"
+  type = map(number)
+  default = {}
+}
+
+variable "location_id_map" {
+  description = "Mapping of location names to IDs"
+  type = map(number)
+  default = {}
+}
+
+variable "tenant_id_map" {
+  description = "Mapping of tenant names to IDs"
+  type = map(number)
+  default = {}
+}

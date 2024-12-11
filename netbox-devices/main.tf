@@ -12,31 +12,7 @@ terraform {
 }
 
 # ######## LOOKUPS ############
-data "netbox_site" "site_lookups" {
-  for_each = toset([
-    for device in var.devices : device.site
-  ])
-  name = each.value
-}
-
-# Look up tenants by name
-data "netbox_tenant" "tenant_lookups" {
-  for_each = toset([
-    for device in var.devices : device.tenant if device.tenant != null
-  ])
-  name = each.value
-}
-
-# Look up locations by name
-data "netbox_location" "location_lookups" {
-  for_each = toset([
-    for device in var.devices : device.location if device.location != null
-  ])
-  # slug = each.value
-  name = each.value
-}
-
-# Look up locations by name
+# Look up racks by name
 data "netbox_racks" "racks_lookups" {
   for_each = toset([
     for device in var.devices : device.rack if device.rack != null
@@ -50,30 +26,12 @@ data "netbox_racks" "racks_lookups" {
 }
 
 locals {
-  # Create lookup maps
-  site_id_map = {
-    for site_name, site_data in data.netbox_site.site_lookups :
-    site_name => site_data.id
-  }
-
-  tenant_id_map = {
-    for tenant_name, tenant_data in data.netbox_tenant.tenant_lookups :
-    tenant_name => tenant_data.id # Direct access to id, no tenants[0]
-  }
-
-  location_id_map = {
-    for location_name, location_data in data.netbox_location.location_lookups :
-    location_name => location_data.id
-  }
-
-  rack_id_map = {
+   rack_id_map = {
     for rack_name, rack_data in data.netbox_racks.racks_lookups :
     rack_name => rack_data.racks[0].id
   }
 }
-
 # ######## END LOOKUPS ############
-
 
 # ######## CONFIGURE DEVICE ############
 
@@ -123,10 +81,10 @@ resource "netbox_device" "device-info" {
   name           = each.value.name
   device_type_id = netbox_device_type.dev_types[each.value.type].id
   role_id        = netbox_device_role.dev_roles[each.value.role].id
-  site_id        = local.site_id_map[each.value.site]
+  site_id        = var.site_id_map[each.value.site]
 
-  tenant_id          = try(local.tenant_id_map[each.value.tenant], null)
-  location_id        = try(local.location_id_map[each.value.location], null)
+  tenant_id          = try(var.tenant_id_map[each.value.tenant], null)
+  location_id        = try(var.location_id_map[each.value.location], null)
   asset_tag          = try(each.value.asset_tag, null)
   cluster_id         = try(each.value.cluster, null)
   comments           = try(each.value.comments, null)
