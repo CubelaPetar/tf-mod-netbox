@@ -11,53 +11,6 @@ terraform {
   }
 }
 
-
-# ######## LOOKUPS ############
-data "netbox_site" "site_lookups" {
-  for_each = toset([
-    for rack in var.racks : rack.site
-  ])
-  name = each.value
-}
-
-# Look up tenants by name
-data "netbox_tenant" "tenant_lookups" {
-  for_each = toset([
-    for rack in var.racks : rack.tenant if rack.tenant != null
-  ])
-  name= each.value
-}
-
-# Look up locations by name
-data "netbox_location" "location_lookups" {
-  for_each = toset([
-    for rack in var.racks : rack.location if rack.location != null
-  ])
-  # slug = each.value
-  name = each.value
-}
-
-locals {
-  # Create lookup maps
-  site_id_map = {
-    for site_name, site_data in data.netbox_site.site_lookups :
-    site_name => site_data.id
-  }
-
-  tenant_id_map = {
-    for tenant_name, tenant_data in data.netbox_tenant.tenant_lookups :
-    tenant_name => tenant_data.id  # Direct access to id, no tenants[0]
-  }
-
-  location_id_map = {
-    for location_name, location_data in data.netbox_location.location_lookups :
-    location_name => location_data.id
-  }
-}
-
-# ######## END LOOKUPS ############
-
-
 # ######## CONFIGURE RACKS ############
 
 # Create Rack Roles
@@ -74,7 +27,7 @@ resource "netbox_rack" "racks" {
   for_each = var.racks
 
   name           = each.value.name
-  site_id        = local.site_id_map[each.value.site]
+  site_id        = var.site_id_map[each.value.site]
   status         = each.value.status
   width          = each.value.width
   u_height       = each.value.u_height
@@ -84,7 +37,7 @@ resource "netbox_rack" "racks" {
   desc_units     = try(each.value.desc_units, false)
   description    = try(each.value.description, null)
   facility_id    = try(each.value.facility, null)
-  location_id    = try(each.value.location, null) != null ? local.location_id_map[each.value.location] : null
+  location_id    = try(each.value.location, null) != null ? var.location_id_map[each.value.location] : null
   max_weight     = try(each.value.max_weight, null)
   mounting_depth = try(each.value.mounting_depth, null)
   outer_depth    = try(each.value.outer_depth, null)
@@ -93,7 +46,7 @@ resource "netbox_rack" "racks" {
   role_id        = try(each.value.role, null) != null ? netbox_rack_role.rack_roles[each.value.role].id : null
   serial         = try(each.value.serial, null)
   tags           = try(each.value.tags, null)
-  tenant_id      = try(each.value.tenant, null) != null ? local.tenant_id_map[each.value.tenant] : null
+  tenant_id      = try(each.value.tenant, null) != null ? var.tenant_id_map[each.value.tenant] : null
   type           = try(each.value.type, "4-post-cabinet")
   weight         = try(each.value.weight, null)
   weight_unit    = try(each.value.weight_unit, "kg")
@@ -107,7 +60,7 @@ resource "netbox_rack_reservation" "rack_reservations" {
   units       = each.value.units
   user_id     = each.value.user_id
   description = each.value.description
-  tenant_id   = local.tenant_id_map[each.value.tenant]
+  tenant_id   = var.tenant_id_map[each.value.tenant]
 }
 
 # ######## END CONFIGURE RACKS ############
