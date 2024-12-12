@@ -7,7 +7,7 @@ variable "device_roles" {
   description = "Map of device roles configurations"
   type = map(object({
     color_hex   = string
-    name        = string
+    name        = optional(string)
     slug        = string
     description = optional(string)
     tags        = optional(list(string))
@@ -19,7 +19,7 @@ variable "device_roles" {
 variable "manufacturers" {
   description = "Map of manufacturer configurations"
   type = map(object({
-    name = string
+    name = optional(string)
     slug = string
   }))
   default = {}
@@ -52,7 +52,7 @@ variable "platforms" {
 variable "devices" {
   description = "Map of device configurations"
   type = map(object({
-    name               = string
+    name               = optional(string)
     site               = string
     role               = string
     type               = string
