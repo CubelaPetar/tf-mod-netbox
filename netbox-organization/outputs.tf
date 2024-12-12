@@ -45,3 +45,14 @@ output "contact_groups" {
   description = "Created contact groups"
   value       = netbox_contact_group.contact_groups
 }
+
+# output "xxx" {
+#   description = "Created xxx"
+#   value       = netbox_location.child_locations
+# }
+
+# output "yyy" {
+#   description = "Created yyy"
+#   value       = netbox_location.locations
+
+# }

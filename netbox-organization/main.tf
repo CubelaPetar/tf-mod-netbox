@@ -46,7 +46,7 @@ resource "netbox_region" "regions" {
 
 # Create Site Groups
 resource "netbox_site_group" "site_groups" {
-  for_each =  var.site_groups
+  for_each = var.site_groups
 
   name        = each.value.name
   slug        = try(each.value.slug, null)
@@ -56,7 +56,7 @@ resource "netbox_site_group" "site_groups" {
 
 # Create site
 resource "netbox_site" "sites" {
-  for_each =  var.sites
+  for_each = var.sites
 
   name             = each.value.name
   slug             = each.value.slug
@@ -69,7 +69,7 @@ resource "netbox_site" "sites" {
   facility         = each.value.facility
   latitude         = each.value.latitude
   longitude        = each.value.longitude
-  region_id = each.value.region != null ? netbox_region.regions[each.value.region].id : null
+  region_id        = each.value.region != null ? netbox_region.regions[each.value.region].id : null
 }
 
 # Create Locations
@@ -81,6 +81,10 @@ resource "netbox_location" "locations" {
   site_id     = each.value.site != null ? netbox_site.sites[each.value.site].id : null
   tenant_id   = each.value.tenant != null ? netbox_tenant.tenants[each.value.tenant].id : null
   description = each.value.description
+
+  lifecycle {
+    ignore_changes = [parent_id]
+  }
 }
 
 # Create Contact Groups
@@ -96,10 +100,10 @@ resource "netbox_contact_group" "contact_groups" {
 resource "netbox_contact" "contacts" {
   for_each = var.contacts
 
-  name        = each.value.name
-  email       = each.value.email
-  phone       = each.value.phone
-  group_id    = each.value.group != null ? netbox_contact_group.contact_groups[each.value.group].id : null
+  name     = each.value.name
+  email    = each.value.email
+  phone    = each.value.phone
+  group_id = each.value.group != null ? netbox_contact_group.contact_groups[each.value.group].id : null
 }
 
 resource "netbox_contact_role" "contact_roles" {
