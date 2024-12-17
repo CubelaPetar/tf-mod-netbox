@@ -17,7 +17,7 @@ Currently you can manage:
 - [x] Devices
 - [ ] Connections
 - [ ] Wireless
-- [ ] IPAM
+- [x] IPAM
 - [ ] VPN
 - [ ] Virtualization
 - [ ] Power
