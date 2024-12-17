@@ -45,11 +45,13 @@ resource "netbox_rack" "racks" {
   outer_width    = try(each.value.outer_width, null)
   role_id        = try(each.value.role, null) != null ? netbox_rack_role.rack_roles[each.value.role].id : null
   serial         = try(each.value.serial, null)
-  tags           = try(each.value.tags, null)
   tenant_id      = try(each.value.tenant, null) != null ? var.tenant_id_map[each.value.tenant] : null
-  type           = try(each.value.type, "4-post-cabinet")
   weight         = try(each.value.weight, null)
   weight_unit    = try(each.value.weight_unit, "kg")
+
+  lifecycle {
+    ignore_changes = [ tags, comments, type ]
+  }
 }
 
 # Create Rack Reservations

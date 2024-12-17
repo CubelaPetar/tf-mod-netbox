@@ -31,7 +31,6 @@ resource "netbox_custom_field_choice_set" "custom_field_choices" {
   extra_choices        = local.custom_field_choices[each.key].choices
   description          = try(each.value.description, null)
   order_alphabetically = try(each.value.order_alphabetically, false)
-
 }
 
 # Create Custom Fields
@@ -64,7 +63,10 @@ resource "netbox_tag" "custom_tags" {
   color_hex   = try(each.value.color_hex, "9e9e9e")
   slug        = try(each.value.slug, null)
   description = try(each.value.description, null)
-  tags        = try(each.value.tags, null)
+
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
 }
 
 # ######## END CONFIGURE CUSTOMIZATION ############

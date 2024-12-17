@@ -77,7 +77,6 @@ resource "netbox_rir" "rirs" {
   description = try(each.value.description, null)
   is_private  = try(each.value.private, null)
   slug        = try(each.value.slug, null)
-
 }
 
 # Add Aggregates
@@ -89,7 +88,10 @@ resource "netbox_aggregate" "aggregates" {
   description = try(each.value.description, null)
   rir_id      = try(netbox_rir.rirs[each.value.rir_name].id, null)
   tenant_id   = try(var.tenant_id_map[each.value.tenant], null)
-  tags        = try(each.value.tags, null)
+
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
 }
 
 # Add Roles
@@ -112,8 +114,11 @@ resource "netbox_vrf" "vrfs" {
   description    = try(each.value.description, null)
   enforce_unique = try(each.value.enforce_unique, null)
   rd             = try(each.value.rd, null)
-  tags           = try(each.value.tags, null)
   tenant_id      = try(var.tenant_id_map[each.value.tenant], null)
+
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
 }
 
 # Add VLAN Groups
@@ -138,7 +143,10 @@ resource "netbox_vlan_group" "vlan_groups" {
     # "virtualization.cluster" = var.cluster_id_map[each.value.scope]
     # "virtualization.clustergroup" = var.cluster_group_id_map[each.value.scope]
   }, each.value.scope_type)
-  # tags        = try(each.value.tags, null)
+
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
 }
 
 # Add VLANs
@@ -152,9 +160,12 @@ resource "netbox_vlan" "vlans" {
   group_id    = try(netbox_vlan_group.vlan_groups[each.value.group].id, null)
   role_id     = try(netbox_ipam_role.roles[each.value.role].id, null)
   status      = try(each.value.status, null)
-  tags        = try(each.value.tags, null)
   site_id     = try(var.site_id_map[each.value.site], null)
   tenant_id   = try(var.tenant_id_map[each.value.tenant], null)
+
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
 }
 
 # Add Prefixes
@@ -169,11 +180,14 @@ resource "netbox_prefix" "prefixes" {
   is_pool       = try(each.value.is_pool, null)
   mark_utilized = try(each.value.mark_utilized, null)
   role_id       = try(netbox_ipam_role.roles[each.value.role].id, null)
-  tags          = try(each.value.tags, null)
   site_id       = try(var.site_id_map[each.value.site], null)
   tenant_id     = try(var.tenant_id_map[each.value.tenant], null)
   vlan_id       = try(netbox_vlan.vlans[each.value.vlan].id, null)
   vrf_id        = try(netbox_vrf.vrfs[each.value.vrf].id, null)
+
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
 }
 
 # Add IP Ranges
@@ -186,9 +200,12 @@ resource "netbox_ip_range" "ranges" {
   description = try(each.value.description, null)
   role_id     = try(netbox_ipam_role.roles[each.value.role].id, null)
   status      = try(each.value.status, null)
-  tags        = try(each.value.tags, null)
   tenant_id   = try(var.tenant_id_map[each.value.tenant], null)
   vrf_id      = try(netbox_vrf.vrfs[each.value.vrf].id, null)
+
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
 }
 
 # Add IP Addresses
@@ -202,7 +219,6 @@ resource "netbox_ip_address" "addresses" {
   description   = try(each.value.description, null)
   dns_name      = try(each.value.dns_name, null)
   role          = try(each.value.role, null)
-  tags          = try(each.value.tags, null)
   tenant_id     = try(var.tenant_id_map[each.value.tenant], null)
   vrf_id        = try(netbox_vrf.vrfs[each.value.vrf].id, null)
 
@@ -210,22 +226,10 @@ resource "netbox_ip_address" "addresses" {
   interface_id   = each.value.object_type == "dcim.interface" ? try(local.dev_interfaces_id_map[each.value.dev_interface], null) : try(local.vm_interface_id_map[each.value.virtual_machine_interface], null)
 
   # nat_inside_address_id        = try(each.value.nat_inside_address_id, null) // TODO: Add nat_inside_address_id
-}
 
-# Add Services
-resource "netbox_service" "services" {
-  for_each = { for service in var.services : service.name => service }
-
-  name     = each.value.name
-  protocol = each.value.protocol
-
-  custom_fields = try(each.value.custom_fields, null)
-  description   = try(each.value.description, null)
-  device_id     = try(each.value.device_id, null)
-  port          = try(each.value.port, null)
-  ports         = try(each.value.ports, null)
-  tags          = try(each.value.tags, null)
-  # virtual_machine_id = try(each.value.virtual_machine_id, null) // TODO: Add virtual_machine_id
+  lifecycle {
+    ignore_changes = [ tags, nat_inside_address_id ]
+  }
 }
 
 # ######## END CONFIGURE IPAM ############

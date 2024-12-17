@@ -34,7 +34,6 @@ locals {
 # ######## END LOOKUPS ############
 
 # ######## CONFIGURE DEVICE ############
-
 resource "netbox_device_role" "dev_roles" {
   for_each = var.device_roles
 
@@ -42,8 +41,11 @@ resource "netbox_device_role" "dev_roles" {
   name        = each.value.name != null ? each.value.name : each.key
   slug        = each.value.slug
   description = try(each.value.description, null)
-  tags        = try(each.value.tags, null)
   vm_role     = try(each.value.vm_role, null)
+
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
 }
 
 resource "netbox_manufacturer" "dev_manufacturers" {
@@ -63,7 +65,10 @@ resource "netbox_device_type" "dev_types" {
 
   is_full_depth = try(each.value.is_full_depth, null)
   part_number   = try(each.value.part_number, null)
-  tags          = try(each.value.tags, null)
+
+  lifecycle {
+    ignore_changes = [ tags ]
+  }
 }
 
 resource "netbox_platform" "dev_platforms" {
@@ -98,6 +103,10 @@ resource "netbox_device" "device-info" {
   rack_position      = try(each.value.rack_position, null)
   serial             = try(each.value.serial, null)
   status             = try(each.value.status, null)
+
+  lifecycle {
+    ignore_changes = [ tags, comments ]
+  }
 }
 
 # ######## END CONFIGURE DEVICE ############
