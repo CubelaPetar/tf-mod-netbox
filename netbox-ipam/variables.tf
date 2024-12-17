@@ -67,7 +67,7 @@ variable "vlan_groups" {
   validation {
     condition = alltrue([
       for group in var.vlan_groups :
-      group.scope_type == null || contains([
+      group.scope_type == null ? true : contains([
         "dcim.location",
         "dcim.site",
         "dcim.sitegroup",

@@ -127,7 +127,7 @@ resource "netbox_vlan_group" "vlan_groups" {
 
   description = try(each.value.description, null)
   scope_type  = try(each.value.scope_type, null)
-  scope_id = lookup({
+  scope_id = each.value.scope_type == null ? null : lookup({
     "dcim.location"  = try(var.location_id_map[each.value.scope], null),
     "dcim.site"      = try(var.site_id_map[each.value.scope], null),
     "dcim.sitegroup" = try(var.site_group_id_map[each.value.scope], null),
@@ -137,7 +137,7 @@ resource "netbox_vlan_group" "vlan_groups" {
     // TODO: find way to add cluster and clustergroup without coupling to virtualization module
     # "virtualization.cluster" = var.cluster_id_map[each.value.scope]
     # "virtualization.clustergroup" = var.cluster_group_id_map[each.value.scope]
-  }, each.value.scope_type, null)
+  }, each.value.scope_type)
   # tags        = try(each.value.tags, null)
 }
 
