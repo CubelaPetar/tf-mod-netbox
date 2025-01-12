@@ -1,5 +1,5 @@
 # Author: Denis Rendler <connect@rendler.net>
-# Copyright: 2024-2029 Denis Rendler
+# Copyright: 2025-2030 Denis Rendler
 # Repository: https://github.com/rendler-denis/tf-mod-netbox
 # License: Check the LICENSE file or the repository for the license of the module.
 
@@ -144,19 +144,19 @@ variable "ip_addresses" {
     tenant        = optional(string)
     vrf           = optional(string, "main")
 
-    object_type                  = optional(string)
-    dev_interface                 = optional(string)
+    object_type               = optional(string)
+    dev_interface             = optional(string)
     virtual_machine_interface = optional(string)
   }))
   default = []
 
-  validation {
-    condition = alltrue([
-      for addr in var.ip_addresses :
-      addr.role == null || contains(["loopback", "secondary", "anycast", "vip", "vrrp", "hsrp", "glbp", "carp"], addr.role)
-    ])
-    error_message = "role must be one of: loopback, secondary, anycast, vip, vrrp, hsrp, glbp, carp"
-  }
+  # validation {
+  #   condition = alltrue([
+  #     for addr in var.ip_addresses :
+  #     addr.role == null || contains(["loopback", "secondary", "anycast", "vip", "vrrp", "hsrp", "glbp", "carp"], addr.role)
+  #   ])
+  #   error_message = "role must be one of: loopback, secondary, anycast, vip, vrrp, hsrp, glbp, carp"
+  # }
 
   validation {
     condition = alltrue([
@@ -178,7 +178,7 @@ variable "ip_addresses" {
 }
 
 variable "services" {
-  description = "List of services"
+  description = "List of services running on devices or virtual machines"
   type = map(object({
     name          = string
     protocol      = string
@@ -187,9 +187,26 @@ variable "services" {
     device_id     = optional(number)
     port          = optional(number)
     ports         = optional(list(number))
-    tags          = optional(list(string))
+    device_vm     = optional(string)
   }))
   default = {}
+
+  validation {
+    condition = alltrue([
+      for service in var.services :
+      contains(["tcp", "udp", "icmp", "icmpv6", "ipv6-icmp"], service.protocol)
+    ])
+    error_message = "protocol must be one of: tcp, udp, icmp, icmpv6, ipv6-icmp"
+  }
+
+  validation {
+    condition = alltrue([
+      for service in var.services :
+      service.port != null || service.ports != null
+    ])
+    error_message = "Either port or ports must be set"
+  }
+
 }
 
 variable "site_id_map" {
@@ -227,4 +244,3 @@ variable "rack_id_map" {
   type        = map(number)
   default     = {}
 }
-

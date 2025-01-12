@@ -12,17 +12,15 @@ It currently handles:
 
 ```terraform
 module "netbox-customization" {
-  source = "github.com/rendler-denis/tf-netbox-mod-customization"
+  source = "github.com/rendler-denis/tf-mod-netbox//netbox-customization"
 
-  for_each = var.organizations
-
-  custom_field_choices = each.value.customizations.custom_field_choices
-  custom_fields        = each.value.customizations.custom_fields
-  custom_tags          = each.value.customizations.custom_tags
+  custom_field_choices = var.organizations.customizations.custom_field_choices
+  custom_fields        = var.organizations.customizations.custom_fields
+  custom_tags          = var.organizations.customizations.custom_tags
 }
 ```
 
-For a data example check the example folder.
+For a vars structure example check the `example/` folder.
 
 ## LICENSE
 

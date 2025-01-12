@@ -1,6 +1,6 @@
 # Author: Denis Rendler <connect@rendler.net>
-# Copyright: 2024-2025 Denis Rendler
-# Repository: https://github.com/rendler-denis/tf-netbox-mod-customization
+# Copyright: 2025-2030 Denis Rendler
+# Repository: https://github.com/rendler-denis/tf-mod-netbox
 # License: Check the LICENSE file or the repository for the license of the module.
 
 terraform {
@@ -52,7 +52,6 @@ resource "netbox_custom_field" "custom_fields" {
   validation_minimum = try(each.value.validation_minimum, null)
   validation_regex   = try(each.value.validation_regex, null)
 }
-
 
 # Create Custom Tags
 resource "netbox_tag" "custom_tags" {

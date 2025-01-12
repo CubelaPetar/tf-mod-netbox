@@ -1,5 +1,5 @@
 # Author: Denis Rendler <connect@rendler.net>
-# Copyright: 2024-2029 Denis Rendler
+# Copyright: 2025-2030 Denis Rendler
 # Repository: https://github.com/rendler-denis/tf-mod-netbox
 # License: Check the LICENSE file or the repository for the license of the module.
 
@@ -10,62 +10,6 @@ terraform {
     }
   }
 }
-
-# ######## LOOKUPS ############
-# Look up racks by name
-data "netbox_racks" "racks_lookups" {
-  for_each = toset([
-    for vgroup in var.vlan_groups : vgroup.scope if vgroup.scope_type == "dcim.rack" && vgroup.scope != null
-  ])
-
-  filter {
-    name  = "name"
-    value = each.value
-  }
-  limit = 1
-}
-
-data "netbox_device_interfaces" "dev_interfaces_lookups" {
-  for_each = toset([
-    for ip in var.ip_addresses : ip.dev_interface if ip.dev_interface != null
-  ])
-
-  filter {
-    name  = "name"
-    value = each.value
-  }
-}
-
-data "netbox_interfaces" "vm_interfaces_lookups" {
-  for_each = toset([
-    for ip in var.ip_addresses : ip.virtual_machine_interface if ip.virtual_machine_interface != null
-  ])
-
-  filter {
-    name  = "id"
-    value = each.value
-  }
-  limit = 1
-}
-
-locals {
-  rack_id_map = {
-    for rack_name, rack_data in data.netbox_racks.racks_lookups :
-    rack_name => rack_data.racks[0].id
-  }
-
-  dev_interfaces_id_map = {
-    for interface_id, interface_data in data.netbox_device_interfaces.dev_interfaces_lookups :
-    interface_data.interfaces[0].name => interface_data.interfaces[0].id
-  }
-
-  vm_interface_id_map = {
-    for vm_interface_id, vm_interface_data in data.netbox_interfaces.vm_interfaces_lookups :
-    vm_interface_id => vm_interface_data.virtual_machine_interfaces[0].id
-  }
-}
-# ######## END LOOKUPS ############
-
 
 # ######## CONFIGURE IPAM ############
 # Add RIRs
@@ -90,7 +34,7 @@ resource "netbox_aggregate" "aggregates" {
   tenant_id   = try(var.tenant_id_map[each.value.tenant], null)
 
   lifecycle {
-    ignore_changes = [ tags ]
+    ignore_changes = [tags]
   }
 }
 
@@ -117,7 +61,7 @@ resource "netbox_vrf" "vrfs" {
   tenant_id      = try(var.tenant_id_map[each.value.tenant], null)
 
   lifecycle {
-    ignore_changes = [ tags ]
+    ignore_changes = [tags]
   }
 }
 
@@ -145,7 +89,7 @@ resource "netbox_vlan_group" "vlan_groups" {
   }, each.value.scope_type)
 
   lifecycle {
-    ignore_changes = [ tags ]
+    ignore_changes = [tags]
   }
 }
 
@@ -164,7 +108,7 @@ resource "netbox_vlan" "vlans" {
   tenant_id   = try(var.tenant_id_map[each.value.tenant], null)
 
   lifecycle {
-    ignore_changes = [ tags ]
+    ignore_changes = [tags]
   }
 }
 
@@ -186,7 +130,7 @@ resource "netbox_prefix" "prefixes" {
   vrf_id        = try(netbox_vrf.vrfs[each.value.vrf].id, null)
 
   lifecycle {
-    ignore_changes = [ tags ]
+    ignore_changes = [tags]
   }
 }
 
@@ -204,7 +148,7 @@ resource "netbox_ip_range" "ranges" {
   vrf_id      = try(netbox_vrf.vrfs[each.value.vrf].id, null)
 
   lifecycle {
-    ignore_changes = [ tags ]
+    ignore_changes = [tags]
   }
 }
 
@@ -223,13 +167,31 @@ resource "netbox_ip_address" "addresses" {
   vrf_id        = try(netbox_vrf.vrfs[each.value.vrf].id, null)
 
   object_type  = try(each.value.object_type, null)
-  interface_id   = each.value.object_type == "dcim.interface" ? try(local.dev_interfaces_id_map[each.value.dev_interface], null) : try(local.vm_interface_id_map[each.value.virtual_machine_interface], null)
+  interface_id = each.value.object_type == "dcim.interface" ? try(local.dev_interfaces_id_map[each.value.dev_interface], null) : try(local.vm_interface_id_map[each.value.virtual_machine_interface], null)
 
   # nat_inside_address_id        = try(each.value.nat_inside_address_id, null) // TODO: Add nat_inside_address_id
 
   lifecycle {
-    ignore_changes = [ tags, nat_inside_address_id ]
+    ignore_changes = [tags, nat_inside_address_id]
   }
 }
 
+# Add Services
+# resource "netbox_service" "services" {
+#   for_each = { for service in var.services : service.name => service }
+
+#   name     = each.value.name
+#   protocol = each.value.protocol
+
+#   custom_fields = try(each.value.custom_fields, null)
+#   description   = try(each.value.description, null)
+#   device_id     = try(each.value.device_id, null)
+#   port          = try(each.value.port, null)
+#   ports         = try(each.value.ports, null)
+#   virtual_machine_id = try(netbox_virtual_machine.vms[each.value.virtual_machine_interface].id, null)
+
+#   lifecycle {
+#     ignore_changes = [ "tags", "virtual_machine_id" ]
+#   }
+# }
 # ######## END CONFIGURE IPAM ############

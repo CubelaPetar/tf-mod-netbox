@@ -1,6 +1,6 @@
 # Author: Denis Rendler <connect@rendler.net>
-# Copyright: 2024-2025 Denis Rendler
-# Repository: https://github.com/rendler-denis/tf-netbox-mod-racks
+# Copyright: 2025-2030 Denis Rendler
+# Repository: https://github.com/rendler-denis/tf-mod-netbox
 # License: Check the LICENSE file or the repository for the license of the module.
 
 terraform {
@@ -10,57 +10,6 @@ terraform {
     }
   }
 }
-
-# ######## LOOKUPS ############
-
-# lookup roles by name
-data "netbox_device_role" "roles_lookups" {
-  for_each = toset([
-    for vm in var.vms : vm.role if vm.role != null
-  ])
-
-  name = each.value
-}
-
-# lookup platforms by name
-data "netbox_platform" "platforms_lookups" {
-  for_each = toset([
-    for vm in var.vms : vm.platform if vm.platform != null
-  ])
-
-  name = each.value
-}
-
-# lookup devices by name
-data "netbox_devices" "devices_lookups" {
-  for_each = toset([
-    for vm in var.vms : vm.device if vm.device != null
-  ])
-
-  filter {
-    name  = "name"
-    value = each.value
-  }
-}
-
-locals {
-  roles_id_map = {
-    for role_name, role_data in data.netbox_device_role.roles_lookups :
-    role_name => role_data.id
-  }
-
-  platform_id_map = {
-    for platform_name, platform_data in data.netbox_platform.platforms_lookups :
-    platform_name => platform_data.id
-  }
-
-  device_id_map = {
-    for device_name, device_data in data.netbox_devices.devices_lookups :
-    device_name => device_data.devices[0].id
-  }
-}
-
-# ####### END LOOKUPS ###########
 
 # ######## CONFIGURE VIRTUALIZATION ############
 
@@ -90,7 +39,10 @@ resource "netbox_cluster" "clusters" {
   tenant_id        = try(var.tenant_id_map[each.value.tenant], null)
   comments         = try(each.value.comments, null)
   description      = try(each.value.description, null)
-  tags             = try(each.value.tags, null)
+
+  lifecycle {
+    ignore_changes = [tags, comments]
+  }
 }
 
 resource "netbox_virtual_machine" "vms" {
@@ -103,7 +55,7 @@ resource "netbox_virtual_machine" "vms" {
   platform_id = try(local.platform_id_map[each.value.platform], null)
   device_id   = try(local.device_id_map[each.value.device], null)
 
-  cluster_id         = try(netbox_cluster.clusters[each.value.cluster].id, null)
+  cluster_id         = try(netbox_cluster.clusters[each.value.cluster].id, try(local.cluster_id_map[each.value.cluster], null))
   site_id            = try(var.site_id_map[each.value.site], null)
   tenant_id          = try(var.tenant_id_map[each.value.tenant], null)
   role_id            = try(local.roles_id_map[each.value.role], null)
@@ -114,7 +66,7 @@ resource "netbox_virtual_machine" "vms" {
   local_context_data = try(jsonencode(each.value.local_context_data), null)
 
   lifecycle {
-    ignore_changes = [tags]
+    ignore_changes = [tags, comments]
   }
 }
 
@@ -133,23 +85,31 @@ resource "netbox_virtual_disk" "vm_disks" {
   }
 }
 
-resource "netbox_interface" "myvm_eth1" {
-  for_each = { for vm in var.vms : vm.name => vm.iface }
+resource "netbox_interface" "vm_eth" {
+  for_each = {
+    for interface in flatten([
+      for vm_name, vm in var.vms : [
+        for net in vm.networking : {
+          vm_name   = vm_name
+          interface = net
+        }
+      ]
+    ]) : "${interface.vm_name}_${interface.interface.name}" => interface
+  }
 
-  virtual_machine_id = netbox_virtual_machine.vms[each.key].id
-  name               = each.value.name
+  name               = each.value.interface.name
+  virtual_machine_id = netbox_virtual_machine.vms[each.value.vm_name].id
 
-  description   = try(each.value.description, null)
-  enabled       = try(each.value.enabled, null)
-  mac_address   = try(each.value.mac_address, null)
-  mode          = try(each.value.mode, null)
-  mtu           = try(each.value.mtu, null)
-  tagged_vlans  = try(each.value.tagged_vlans, null)
-  type          = try(each.value.type, null)
-  untagged_vlan = try(each.value.untagged_vlan, null)
+  description   = try(each.value.interface.description, null)
+  enabled       = try(each.value.interface.enabled, true)
+  mac_address   = try(each.value.interface.mac_address, null)
+  mode          = try(each.value.interface.mode, "access")
+  mtu           = try(each.value.interface.mtu, "1500")
+  untagged_vlan = each.value.interface.untagged_vlan != null ? local.vlan_id_map[each.value.interface.untagged_vlan] : null
+  tagged_vlans  = each.value.interface.tagged_vlans != null ? [for vlan in each.value.interface.tagged_vlans : local.vlan_id_map[vlan]] : []
 
   lifecycle {
-    ignore_changes = [tags]
+    ignore_changes = [tags, description, mtu]
   }
 }
 

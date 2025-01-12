@@ -1,6 +1,6 @@
 # Author: Denis Rendler <connect@rendler.net>
-# Copyright: 2024-2025 Denis Rendler
-# Repository: https://github.com/rendler-denis/tf-netbox-mod-device
+# Copyright: 2025-2030 Denis Rendler
+# Repository: https://github.com/rendler-denis/tf-mod-netbox
 # License: Check the LICENSE file or the repository for the license of the module.
 
 terraform {
@@ -77,7 +77,7 @@ resource "netbox_platform" "dev_platforms" {
   name = each.value.name
 
   slug            = each.value.slug
-  manufacturer_id = netbox_manufacturer.dev_manufacturers[each.value.manufacturer].id
+  manufacturer_id = try(netbox_manufacturer.dev_manufacturers[each.value.manufacturer].id, null)
 }
 
 resource "netbox_device" "device-info" {
@@ -92,12 +92,12 @@ resource "netbox_device" "device-info" {
   location_id        = try(var.location_id_map[each.value.location], null)
   asset_tag          = try(each.value.asset_tag, null)
   cluster_id         = try(each.value.cluster, null)
-  comments           = each.key // try(each.value.comments, null)
+  comments           = try(each.value.comments, each.key)
   custom_fields      = try(each.value.custom_fields, null)
   config_template_id = try(each.value.config_template, null)
   description        = try(each.value.description, null)
   local_context_data = jsonencode(try(each.value.local_context_data, {}))
-  platform_id        = netbox_platform.dev_platforms[each.value.platform].id
+  platform_id        = try(netbox_platform.dev_platforms[each.value.platform].id, null)
   rack_id            = try(local.rack_id_map[each.value.rack], null)
   rack_face          = try(each.value.rack_face, null)
   rack_position      = try(each.value.rack_position, null)
@@ -107,6 +107,34 @@ resource "netbox_device" "device-info" {
   lifecycle {
     ignore_changes = [ tags, comments ]
   }
+}
+
+resource "netbox_device_interface" "dev_interfaces" {
+   for_each = merge([
+    for device_key, device in var.devices : {
+      for iface in device.interfaces : "${device.name}_${iface.name}" => merge(iface, { device = device_key, device_name = device.name })
+    } if device.interfaces != null
+  ]...)
+
+  name      = "${each.value.name} (${each.value.device_name})"
+  device_id = netbox_device.device-info[each.value.device].id
+  type      = each.value.type
+
+  description                = try(each.value.description, null)
+  enabled                    = try(each.value.enabled, null)
+  label                      = try(each.value.label, null)
+  mac_address                = try(each.value.mac_address, null)
+  mgmtonly                   = try(each.value.mgmtonly, false)
+  mode                       = try(each.value.mode, "access")
+  mtu                        = try(each.value.mtu, 1500)
+  speed                      = try(each.value.speed, null)
+  tagged_vlans               = try(each.value.tagged_vlans, null)
+  untagged_vlan              = try(each.value.untagged_vlan, null)
+
+  lifecycle {
+    ignore_changes = [tags, parent_device_interface_id, lag_device_interface_id]
+  }
+
 }
 
 # ######## END CONFIGURE DEVICE ############

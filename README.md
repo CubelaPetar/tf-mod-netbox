@@ -19,7 +19,7 @@ Currently you can manage:
 - [ ] Wireless
 - [x] IPAM
 - [ ] VPN
-- [ ] Virtualization
+- [x] Virtualization
 - [ ] Power
 - [ ] Provisioning
 - [x] Customization

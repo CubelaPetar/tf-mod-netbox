@@ -18,7 +18,7 @@ It manages the following categories:
 
 ```terraform
 module "netbox-org" {
-    source = "github.com/rendler-denis/tf-netbox-mod-organization"
+    source = "github.com/rendler-denis/tf-mod-netbox//netbox-organization"
 
     for_each = var.organizations
 
