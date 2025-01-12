@@ -6,7 +6,8 @@
 terraform {
   required_providers {
     netbox = {
-      source = "e-breuninger/netbox"
+      source  = "e-breuninger/netbox"
+      version = "=3.9.2"
     }
   }
 }
@@ -44,7 +45,7 @@ resource "netbox_device_role" "dev_roles" {
   vm_role     = try(each.value.vm_role, null)
 
   lifecycle {
-    ignore_changes = [ tags ]
+    ignore_changes = [tags]
   }
 }
 
@@ -67,7 +68,7 @@ resource "netbox_device_type" "dev_types" {
   part_number   = try(each.value.part_number, null)
 
   lifecycle {
-    ignore_changes = [ tags ]
+    ignore_changes = [tags]
   }
 }
 
@@ -105,12 +106,12 @@ resource "netbox_device" "device-info" {
   status             = try(each.value.status, null)
 
   lifecycle {
-    ignore_changes = [ tags, comments ]
+    ignore_changes = [tags, comments]
   }
 }
 
 resource "netbox_device_interface" "dev_interfaces" {
-   for_each = merge([
+  for_each = merge([
     for device_key, device in var.devices : {
       for iface in device.interfaces : "${device.name}_${iface.name}" => merge(iface, { device = device_key, device_name = device.name })
     } if device.interfaces != null
@@ -120,16 +121,16 @@ resource "netbox_device_interface" "dev_interfaces" {
   device_id = netbox_device.device-info[each.value.device].id
   type      = each.value.type
 
-  description                = try(each.value.description, null)
-  enabled                    = try(each.value.enabled, null)
-  label                      = try(each.value.label, null)
-  mac_address                = try(each.value.mac_address, null)
-  mgmtonly                   = try(each.value.mgmtonly, false)
-  mode                       = try(each.value.mode, "access")
-  mtu                        = try(each.value.mtu, 1500)
-  speed                      = try(each.value.speed, null)
-  tagged_vlans               = try(each.value.tagged_vlans, null)
-  untagged_vlan              = try(each.value.untagged_vlan, null)
+  description   = try(each.value.description, null)
+  enabled       = try(each.value.enabled, null)
+  label         = try(each.value.label, null)
+  mac_address   = try(each.value.mac_address, null)
+  mgmtonly      = try(each.value.mgmtonly, false)
+  mode          = try(each.value.mode, "access")
+  mtu           = try(each.value.mtu, 1500)
+  speed         = try(each.value.speed, null)
+  tagged_vlans  = try(each.value.tagged_vlans, null)
+  untagged_vlan = try(each.value.untagged_vlan, null)
 
   lifecycle {
     ignore_changes = [tags, parent_device_interface_id, lag_device_interface_id]

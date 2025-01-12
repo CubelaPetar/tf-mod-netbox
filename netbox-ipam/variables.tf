@@ -177,37 +177,36 @@ variable "ip_addresses" {
   }
 }
 
-variable "services" {
-  description = "List of services running on devices or virtual machines"
-  type = map(object({
-    name          = string
-    protocol      = string
-    custom_fields = optional(map(string))
-    description   = optional(string)
-    device_id     = optional(number)
-    port          = optional(number)
-    ports         = optional(list(number))
-    device_vm     = optional(string)
-  }))
-  default = {}
+# variable "services" {
+#   description = "List of services running on devices or virtual machines"
+#   type = map(object({
+#     name          = string
+#     protocol      = string
+#     custom_fields = optional(map(string))
+#     description   = optional(string)
+#     device_id     = optional(number)
+#     port          = optional(number)
+#     ports         = optional(list(number))
+#     device_vm     = optional(string)
+#   }))
+#   default = {}
 
-  validation {
-    condition = alltrue([
-      for service in var.services :
-      contains(["tcp", "udp", "icmp", "icmpv6", "ipv6-icmp"], service.protocol)
-    ])
-    error_message = "protocol must be one of: tcp, udp, icmp, icmpv6, ipv6-icmp"
-  }
+#   validation {
+#     condition = alltrue([
+#       for service in var.services :
+#       contains(["tcp", "udp", "icmp", "icmpv6", "ipv6-icmp"], service.protocol)
+#     ])
+#     error_message = "protocol must be one of: tcp, udp, icmp, icmpv6, ipv6-icmp"
+#   }
 
-  validation {
-    condition = alltrue([
-      for service in var.services :
-      service.port != null || service.ports != null
-    ])
-    error_message = "Either port or ports must be set"
-  }
-
-}
+#   validation {
+#     condition = alltrue([
+#       for service in var.services :
+#       service.port != null || service.ports != null
+#     ])
+#     error_message = "Either port or ports must be set"
+#   }
+# }
 
 variable "site_id_map" {
   description = "Mapping of site names to IDs"
@@ -235,12 +234,6 @@ variable "location_id_map" {
 
 variable "region_id_map" {
   description = "Mapping of region names to IDs"
-  type        = map(number)
-  default     = {}
-}
-
-variable "rack_id_map" {
-  description = "Mapping of rack names to IDs"
   type        = map(number)
   default     = {}
 }

@@ -5,7 +5,7 @@
 
 output "managed_customizations" {
   description = "Managed customizations"
-  value       = {
+  value = {
     custom_fields = {
       for custom_field in netbox_custom_field.custom_fields :
       custom_field.name => {

@@ -6,7 +6,8 @@
 terraform {
   required_providers {
     netbox = {
-      source = "e-breuninger/netbox"
+      source  = "e-breuninger/netbox"
+      version = "= 3.9.2"
     }
   }
 }
@@ -57,14 +58,14 @@ resource "netbox_custom_field" "custom_fields" {
 resource "netbox_tag" "custom_tags" {
   for_each = var.custom_tags
 
-  name        = each.value.name
+  name = each.value.name
 
   color_hex   = try(each.value.color_hex, "9e9e9e")
   slug        = try(each.value.slug, null)
   description = try(each.value.description, null)
 
   lifecycle {
-    ignore_changes = [ tags ]
+    ignore_changes = [tags]
   }
 }
 
