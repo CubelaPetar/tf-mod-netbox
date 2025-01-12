@@ -5,14 +5,14 @@
 
 variable "devices" {
   description = "Map of devices with their primary IP addresses"
-  type = map(string)
+  type        = map(string)
 
   default = {}
 }
 
 variable "vms" {
   description = "Map of virtual machines with their primary IP addresses"
-  type = map(string)
+  type        = map(string)
 
   default = {}
 }

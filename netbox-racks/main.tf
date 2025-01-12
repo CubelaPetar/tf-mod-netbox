@@ -6,7 +6,8 @@
 terraform {
   required_providers {
     netbox = {
-      source = "e-breuninger/netbox"
+      source  = "e-breuninger/netbox"
+      version = "=3.9.2"
     }
   }
 }
@@ -50,7 +51,7 @@ resource "netbox_rack" "racks" {
   weight_unit    = try(each.value.weight_unit, "kg")
 
   lifecycle {
-    ignore_changes = [ tags, comments, type ]
+    ignore_changes = [tags, comments, type]
   }
 }
 

@@ -1,0 +1,55 @@
+name: 'TFLint Check'
+
+on:
+  push:
+    paths:
+      - '**.tf'
+      - '.github/workflows/tflint.yml'
+  pull_request:
+    paths:
+      - '**.tf'
+      - '.github/workflows/tflint.yml'
+
+jobs:
+  tflint:
+    name: 'TFLint'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup TFLint
+      uses: terraform-linters/setup-tflint@v4
+      with:
+        tflint_version: latest
+
+    - name: Initialize TFLint
+      run: tflint --init
+
+    - name: Find Terraform directories
+      id: find_dirs
+      run: |
+        echo "terraform_dirs<<EOF" >> $GITHUB_OUTPUT
+        find . -type f -name "*.tf" -exec dirname {} \; | sort -u >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Run TFLint recursively
+      run: |
+        EXIT_CODE=0
+        while IFS= read -r dir; do
+          echo "Running TFLint in directory: $dir"
+          pushd "$dir" > /dev/null
+
+          # Initialize TFLint in each directory
+          tflint --init
+
+          # Run TFLint and store its exit code
+          if ! tflint --format compact -c ../.tflint.hcl; then
+            EXIT_CODE=1
+          fi
+
+          popd > /dev/null
+        done <<< "$(echo "${{ steps.find_dirs.outputs.terraform_dirs }}")"
+
+        exit $EXIT_CODE

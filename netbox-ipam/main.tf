@@ -6,7 +6,8 @@
 terraform {
   required_providers {
     netbox = {
-      source = "e-breuninger/netbox"
+      source  = "e-breuninger/netbox"
+      version = "=3.9.2"
     }
   }
 }
@@ -86,7 +87,7 @@ resource "netbox_vlan_group" "vlan_groups" {
     // TODO: find way to add cluster and clustergroup without coupling to virtualization module
     # "virtualization.cluster" = var.cluster_id_map[each.value.scope]
     # "virtualization.clustergroup" = var.cluster_group_id_map[each.value.scope]
-  }, each.value.scope_type)
+  }, each.value.scope_type, null)
 
   lifecycle {
     ignore_changes = [tags]

@@ -73,18 +73,18 @@ variable "devices" {
     status             = optional(string)
 
     interfaces = optional(list(object({
-      name               = string
-      type               = string
-      description        = optional(string)
-      enabled            = optional(bool, true)
-      label              = optional(string)
-      mac_address        = optional(string)
-      mgmt_only          = optional(bool)
-      mode               = optional(string, "access")
-      mtu                = optional(number)
-      speed              = optional(number)
-      untagged_vlan      = optional(number)
-      tagged_vlans       = optional(list(number))
+      name          = string
+      type          = string
+      description   = optional(string)
+      enabled       = optional(bool, true)
+      label         = optional(string)
+      mac_address   = optional(string)
+      mgmt_only     = optional(bool)
+      mode          = optional(string, "access")
+      mtu           = optional(number)
+      speed         = optional(number)
+      untagged_vlan = optional(number)
+      tagged_vlans  = optional(list(number))
     })))
   }))
   default = {}
@@ -92,18 +92,18 @@ variable "devices" {
 
 variable "site_id_map" {
   description = "Mapping of site names to IDs"
-  type = map(number)
-  default = {}
+  type        = map(number)
+  default     = {}
 }
 
 variable "location_id_map" {
   description = "Mapping of location names to IDs"
-  type = map(number)
-  default = {}
+  type        = map(number)
+  default     = {}
 }
 
 variable "tenant_id_map" {
   description = "Mapping of tenant names to IDs"
-  type = map(number)
-  default = {}
+  type        = map(number)
+  default     = {}
 }
