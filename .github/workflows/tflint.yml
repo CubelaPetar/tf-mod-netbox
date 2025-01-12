@@ -42,10 +42,10 @@ jobs:
           pushd "$dir" > /dev/null
 
           # Initialize TFLint in each directory
-          tflint --init -c ../.tflint.hcl
+          tflint --init
 
           # Run TFLint and store its exit code
-          if ! tflint --format compact; then
+          if ! tflint --format compact -c ../.tflint.hcl; then
             EXIT_CODE=1
           fi
 
