@@ -1,4 +1,16 @@
 
+<a name="0.1.1">Release 0.1.1</a>
+## [0.1.1](https://github.com/rendler-denis/tf-mod-netbox/compare/0.1.0...0.1.1) (2025-01-12)
+
+### Bug Fixes
+
+* wrong file path
+
+### Pull Requests
+
+* Merge pull request [#3](https://github.com/rendler-denis/tf-mod-netbox/issues/3) from rendler-denis/develop
+
+
 <a name="0.1.0">Release 0.1.0</a>
 ## 0.1.0 (2025-01-12)
 
