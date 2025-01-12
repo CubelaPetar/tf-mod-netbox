@@ -1,14 +1,14 @@
 # Author: Denis Rendler <connect@rendler.net>
-# Copyright: 2024-2025 Denis Rendler
-# Repository: https://github.com/rendler-denis/tf-netbox-mod-racks
+# Copyright: 2025-2030 Denis Rendler
+# Repository: https://github.com/rendler-denis/tf-mod-netbox
 # License: Check the LICENSE file or the repository for the license of the module.
 
 output "rack_roles" {
-  description = "Created rack roles"
+  description = "Managed rack roles"
   value       = netbox_rack_role.rack_roles
 }
 
 output "racks" {
-  description = "Created racks"
+  description = "Managed racks"
   value       = netbox_rack.racks
 }

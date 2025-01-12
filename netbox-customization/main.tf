@@ -1,12 +1,13 @@
 # Author: Denis Rendler <connect@rendler.net>
-# Copyright: 2024-2025 Denis Rendler
-# Repository: https://github.com/rendler-denis/tf-netbox-mod-customization
+# Copyright: 2025-2030 Denis Rendler
+# Repository: https://github.com/rendler-denis/tf-mod-netbox
 # License: Check the LICENSE file or the repository for the license of the module.
 
 terraform {
   required_providers {
     netbox = {
-      source = "e-breuninger/netbox"
+      source  = "e-breuninger/netbox"
+      version = "= 3.9.2"
     }
   }
 }
@@ -53,19 +54,18 @@ resource "netbox_custom_field" "custom_fields" {
   validation_regex   = try(each.value.validation_regex, null)
 }
 
-
 # Create Custom Tags
 resource "netbox_tag" "custom_tags" {
   for_each = var.custom_tags
 
-  name        = each.value.name
+  name = each.value.name
 
   color_hex   = try(each.value.color_hex, "9e9e9e")
   slug        = try(each.value.slug, null)
   description = try(each.value.description, null)
 
   lifecycle {
-    ignore_changes = [ tags ]
+    ignore_changes = [tags]
   }
 }
 

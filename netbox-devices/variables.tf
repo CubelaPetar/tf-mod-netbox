@@ -1,6 +1,6 @@
 # Author: Denis Rendler <connect@rendler.net>
-# Copyright: 2024-2025 Denis Rendler
-# Repository: https://github.com/rendler-denis/tf-netbox-mod-device
+# Copyright: 2025-2030 Denis Rendler
+# Repository: https://github.com/rendler-denis/tf-mod-netbox
 # License: Check the LICENSE file or the repository for the license of the module.
 
 variable "device_roles" {
@@ -44,7 +44,7 @@ variable "platforms" {
   type = map(object({
     name         = string
     slug         = string
-    manufacturer = string
+    manufacturer = optional(string)
   }))
   default = {}
 }
@@ -56,7 +56,7 @@ variable "devices" {
     site               = string
     role               = string
     type               = string
-    platform           = string
+    platform           = optional(string)
     tenant             = optional(string)
     location           = optional(string)
     asset_tag          = optional(string)
@@ -71,24 +71,39 @@ variable "devices" {
     rack_position      = optional(number)
     serial             = optional(string)
     status             = optional(string)
+
+    interfaces = optional(list(object({
+      name          = string
+      type          = string
+      description   = optional(string)
+      enabled       = optional(bool, true)
+      label         = optional(string)
+      mac_address   = optional(string)
+      mgmt_only     = optional(bool)
+      mode          = optional(string, "access")
+      mtu           = optional(number)
+      speed         = optional(number)
+      untagged_vlan = optional(number)
+      tagged_vlans  = optional(list(number))
+    })))
   }))
   default = {}
 }
 
 variable "site_id_map" {
   description = "Mapping of site names to IDs"
-  type = map(number)
-  default = {}
+  type        = map(number)
+  default     = {}
 }
 
 variable "location_id_map" {
   description = "Mapping of location names to IDs"
-  type = map(number)
-  default = {}
+  type        = map(number)
+  default     = {}
 }
 
 variable "tenant_id_map" {
   description = "Mapping of tenant names to IDs"
-  type = map(number)
-  default = {}
+  type        = map(number)
+  default     = {}
 }

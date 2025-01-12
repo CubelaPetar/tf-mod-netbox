@@ -1,4 +1,4 @@
-Copyright 2024-2025 Denis-Florin Rendler
+Copyright 2025-2030 Denis-Florin Rendler
 
 You are allowed to use this module for both private and commercial use as long as these
 LICENSE.md and README.md files are present.

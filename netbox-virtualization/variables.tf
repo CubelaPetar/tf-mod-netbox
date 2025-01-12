@@ -1,9 +1,16 @@
+# Author: Denis Rendler <connect@rendler.net>
+# Copyright: 2025-2030 Denis Rendler
+# Repository: https://github.com/rendler-denis/tf-mod-netbox
+# License: Check the LICENSE file or the repository for the license of the module.
+
 variable "cluster_types" {
   description = "List of cluster types to be created in NetBox"
   type = map(object({
     name = string
     slug = string
   }))
+
+  default = {}
 }
 
 variable "cluster_groups" {
@@ -13,6 +20,8 @@ variable "cluster_groups" {
     description = string
     slug        = string
   }))
+
+  default = {}
 }
 
 variable "clusters" {
@@ -27,6 +36,8 @@ variable "clusters" {
     description   = optional(string)
     tags          = optional(list(string))
   }))
+
+  default = {}
 }
 
 variable "vms" {
@@ -54,20 +65,33 @@ variable "vms" {
       custom_fields = optional(map(any))
     })
 
-    iface = object({
+    networking = list(object({
       name          = string
+      vm            = string
       description   = optional(string)
-      enabled       = optional(bool)
+      enabled       = optional(bool, true)
       mac_address   = optional(string)
-      mode          = optional(string)
-      mtu           = optional(number)
+      vrf           = optional(string)
+      mode          = optional(string, "access")
+      mtu           = optional(number, "1500")
       tagged_vlans  = optional(list(number))
-      type          = optional(string)
       untagged_vlan = optional(number)
-    })
+      ip_address    = optional(string)
+    }))
+
   }))
 
   default = {}
+
+  validation {
+    condition = alltrue([
+      for iface in var.vms : alltrue([
+        for net in iface.networking : contains(["access", "tagged", "tagged-all"], net.mode)
+      ])
+    ])
+    error_message = "Interface mode must be one of 'access', 'tagged', or 'tagged-all'"
+  }
+
 }
 
 variable "site_id_map" {

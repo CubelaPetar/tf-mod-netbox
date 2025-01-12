@@ -14,21 +14,19 @@ It manages the following sections:
 module "netbox-racks" {
   source = "github.com/rendler-denis/tf-netbox-mod-racks"
 
-  # useful if you manage the entire organization through these
-  # modules. otherwise you have to configure in advance the organization info
-  depends_on = [ module.netbox-org ]
+  depends_on = [ module.netbox-org, module.netbox-data-org ]
 
-  for_each = var.organizations
+  rack_roles        = var.organizations.rack_config.rack_roles
+  racks             = var.organizations.rack_config.racks
+  rack_reservations = var.organizations.rack_config.rack_reservations
 
-  rack_roles        = each.value.rack_config.rack_roles
-  racks             = each.value.rack_config.racks
-  rack_reservations = each.value.rack_config.rack_reservations
+  site_id_map       = module.netbox-org-data.sites_map
+  location_id_map   = module.netbox-org-data.locations_map
+  tenant_id_map     = module.netbox-org-data.tenants_map
 }
 ```
 
 For a data example check the example folder.
-
-The module will automatically lookup the organization information by name.
 
 ## LICENSE
 

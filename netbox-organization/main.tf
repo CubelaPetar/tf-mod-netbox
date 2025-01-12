@@ -1,15 +1,13 @@
 # Author: Denis Rendler <connect@rendler.net>
-# Copyright: 2024-2025 Denis Rendler
-# Repository: https://github.com/rendler-denis/tf-netbox-mod-organization
+# Copyright: 2025-2030 Denis Rendler
+# Repository: https://github.com/rendler-denis/tf-mod-netbox
 # License: Check the LICENSE file or the repository for the license of the module.
-#
-# This module creates the organization structure in Netbox.
-# It creates Tenant Groups, Tenants, Regions, Site Groups, Sites, Locations, Contact Groups, and Contacts.
 
 terraform {
   required_providers {
     netbox = {
-      source = "e-breuninger/netbox"
+      source  = "e-breuninger/netbox"
+      version = "=3.9.2"
     }
   }
 }

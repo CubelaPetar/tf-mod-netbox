@@ -1,6 +1,6 @@
 # Author: Denis Rendler <connect@rendler.net>
-# Copyright: 2024-2025 Denis Rendler
-# Repository: https://github.com/rendler-denis/tf-netbox-mod-racks
+# Copyright: 2025-2030 Denis Rendler
+# Repository: https://github.com/rendler-denis/tf-mod-netbox
 # License: Check the LICENSE file or the repository for the license of the module.
 
 variable "rack_roles" {
@@ -30,17 +30,17 @@ variable "racks" {
     custom_fields  = optional(map(any))
     desc_units     = optional(bool)
     description    = optional(string)
-    facility    = optional(string)
-    location    = optional(string)
+    facility       = optional(string)
+    location       = optional(string)
     max_weight     = optional(number)
     mounting_depth = optional(number)
     outer_depth    = optional(number)
     outer_unit     = optional(string)
     outer_width    = optional(number)
-    role        = optional(string)
+    role           = optional(string)
     serial         = optional(string)
     tags           = optional(set(string))
-    tenant      = optional(string)
+    tenant         = optional(string)
     type           = optional(string)
     weight         = optional(number)
     weight_unit    = optional(string)
@@ -73,29 +73,29 @@ variable "racks" {
 variable "rack_reservations" {
   description = "List of rack reservations to create"
   type = map(object({
-    rack     = string
+    rack        = string
     units       = set(number)
     user_id     = number
     description = optional(string)
-    tenant   = optional(string)
+    tenant      = optional(string)
   }))
   default = {}
 }
 
 variable "site_id_map" {
   description = "Mapping of site names to IDs"
-  type = map(number)
-  default = {}
+  type        = map(number)
+  default     = {}
 }
 
 variable "location_id_map" {
   description = "Mapping of location names to IDs"
-  type = map(number)
-  default = {}
+  type        = map(number)
+  default     = {}
 }
 
 variable "tenant_id_map" {
   description = "Mapping of tenant names to IDs"
-  type = map(number)
-  default = {}
+  type        = map(number)
+  default     = {}
 }
