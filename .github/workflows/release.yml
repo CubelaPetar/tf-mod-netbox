@@ -38,6 +38,6 @@ jobs:
           name: Release ${{ github.ref_name }}
           body_path: CHANGELOG.md
           files: |
-            release-${{ github.ref_name }}.tar.gz
+            release/release-${{ github.ref_name }}.tar.gz
           draft: false
           prerelease: false
