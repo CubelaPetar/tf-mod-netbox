@@ -12,16 +12,18 @@ terraform {
   }
 }
 
-resource "netbox_device_primary_ip" "dev_primary_ipv4" {
+resource "netbox_device_primary_ip" "dev_primary_ipv6" {
   for_each = var.devices
 
-  device_id     = local.device_id_map[each.key]
-  ip_address_id = local.ip_id_map[each.value]
+  device_id           = local.device_id_map[each.key]
+  ip_address_id       = local.ip_id_map[each.value]
+  ip_address_version  = 6
 }
 
-resource "netbox_primary_ip" "vm_primary_ipv4" {
+resource "netbox_primary_ip" "vm_primary_ipv6" {
   for_each = var.vms
 
-  virtual_machine_id = local.vm_id_map[each.key]
-  ip_address_id      = local.ip_id_map[each.value]
+  virtual_machine_id  = local.vm_id_map[each.key]
+  ip_address_id       = local.ip_id_map[each.value]
+  ip_address_version  = 6
 }
