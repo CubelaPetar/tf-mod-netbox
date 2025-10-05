@@ -56,8 +56,7 @@ variable "vlan_groups" {
   type = map(object({
     name        = string
     slug        = string
-    min_vid     = number
-    max_vid     = number
+    vid_ranges  = list(list(number))
     description = optional(string)
     scope       = optional(string)
     scope_type  = optional(string)

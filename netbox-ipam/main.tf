@@ -72,8 +72,7 @@ resource "netbox_vlan_group" "vlan_groups" {
 
   name    = each.value.name
   slug    = each.value.slug
-  min_vid = each.value.min_vid
-  max_vid = each.value.max_vid
+  vid_ranges = each.value.vid_ranges
 
   description = try(each.value.description, null)
   scope_type  = try(each.value.scope_type, null)
