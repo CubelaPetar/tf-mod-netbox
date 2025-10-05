@@ -76,7 +76,7 @@ resource "netbox_virtual_disk" "vm_disks" {
 
   virtual_machine_id = netbox_virtual_machine.vms[each.key].id
   name               = each.value.name
-  size_gb            = each.value.size
+  size_mb            = each.value.size
 
   custom_fields = try(each.value.custom_fields, null)
   description   = try(each.value.description, null)
